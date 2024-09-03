@@ -1,0 +1,11 @@
+[project]
+name = "builder"
+version= "0.0.1"
+
+[[authors]]
+name = "Sun YiZhen"
+email = "Iridium2345@gmail.com"
+
+[build-system]
+requires=["setuptools"]
+build-backend="setuptools.build_meta"

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, ABCMeta, abstractmethod
-from enum import EnumType
+from enum import EnumType,Enum
 from pathlib import Path
 from typing import Any, Iterable, Tuple , Self
 
@@ -9,10 +9,10 @@ from ..util.types import FileFilter
 
 class ArgManagerAPI(ABC):
     @abstractmethod
-    def addArg(self,name:str,value:str|Iterable=None) -> Self : pass
+    def addArg(self,name:str|Enum,value:str|Iterable=None) -> Self : pass
 
     @abstractmethod
-    def addArgs(self,*args:Tuple[str,str|None]) -> Self: pass
+    def addArgs(self,*args:Tuple[str|Enum,str|None]) -> Self: pass
 
     @abstractmethod
     def removeArg(self,name) -> str : pass
@@ -33,16 +33,13 @@ class CommandAPI(ArgManagerAPI,metaclass=CommandMeta):
     Global:ArgManagerAPI=None
 
     @abstractmethod
-    def addDir(self,path:Path|str,filter:FileFilter,recursion:bool=True) -> Self:pass
+    def addDir(self,path:Path|str|Enum,filter:FileFilter,recursion:bool=True) -> Self:pass
 
     @abstractmethod
-    def addFile(self,path:Path|str) -> Self:pass
+    def addFile(self,path:Path|str|Enum) -> Self:pass
 
     @abstractmethod
     def iterFiles(self) -> Iterable[Path]:pass
-
-    @abstractmethod
-    def setOutputPath(self,path:str|Path) -> Self:pass
 
     @abstractmethod
     def setCustom(self,k,v) -> Self:pass
@@ -75,10 +72,14 @@ class BuilderAPI(ArgManagerAPI):
 
     @WorkPath.setter
     @abstractmethod
-    def WorkPath(self,path:Path|str) -> None:pass
+    def WorkPath(self,path:Path|str|Enum) -> None:pass
 
     @property
     def Name(self) -> str:pass
 
     @abstractmethod
     def addCommand(self,Command:CommandAPI) -> None:pass
+
+    @abstractmethod
+    def cmdlst(self) -> Iterable[str]:pass
+    

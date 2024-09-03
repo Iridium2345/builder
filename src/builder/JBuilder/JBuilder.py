@@ -35,29 +35,32 @@ class javac(_javaCmd):
         return "javac"
 
 class jar(_javaCmd):
+    """
+    jar tool
     
+    **should put the arg 'f' before the arg 'm'**
+    
+    """
     Global=ArgManager()
     
     class AvailableCustom(Enum):
         jar_file="jar_file"
+        jar_path="jar_path"
         mani_file="mani_file"
-    
-    def getOutPut(self):
-        file_name=Path(f"{self.project.Name}.jar")
-        if self.OutputPath:
-            return self.OutputPath.joinpath(file_name)
-        else:
-            return file_name 
     
     def cmdName(self) -> str:
         return "jar"
     
     @property
     def command(self):
+        jar_path=Path(self.project.WorkPath if
+            not (tmp:=self.getCustom(self.AvailableCustom.jar_path)) else tmp)
+        jar_path=jar_path.joinpath(x:=f"{self.project.Name}.jar" if
+            not (tmp:=self.getCustom(self.AvailableCustom.jar_file)) else tmp)
         return "{} {} {} {} -C {}".format(
             self.getExecutable(),
             self.getArgString(),
-            self.getCustom(self.AvailableCustom.jar_file),
+            jar_path,
             self.getCustom(self.AvailableCustom.mani_file),
             self.getFilesString()
         )
