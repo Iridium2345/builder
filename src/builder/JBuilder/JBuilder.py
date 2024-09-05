@@ -1,4 +1,4 @@
-from ..BaseBuilder.impl import BaseBuilder,BaseCommand,ArgManager
+from ..BaseBuilder.impl import BaseGroup,BaseCommand,ArgManager,BaseProject
 from ..util.types import FileFilter
 
 from pathlib import Path
@@ -14,20 +14,46 @@ class JFilter:
     def ClassFile():
         return FileFilter().addRule(lambda x: x.suffix in (".class",))
     
+    @staticmethod
+    def JarFile():
+        return FileFilter().addRule(lambda x: x.suffix in (".jar",))
+    
 class _javaCmd(BaseCommand):    
     def cmdName(self) -> str:pass
     def getExecutable(self):
-        assert isinstance(self.project,JavaProject)
-        return ("{}\\".format(self.project.JavaHome) if self.project.JavaHome else '' )+self.cmdName() 
+        assert isinstance(self.group,JavaGroup)
+        return ("{}\\".format(self.group.JavaHome) if self.group.JavaHome else '' )+self.cmdName() 
+
+class _class_path:
+    
+    def __init__(self,arg) -> None:
+        self.arg=arg
+    
+    def format(self,class_path):
+        return self.arg+" "+";".join(map(str,class_path))        
 
 class java(_javaCmd):
     
+    class Arg(Enum):
+        Version="-version"
+        Jar="-jar"
+        Class_Path=_class_path("-classpath") 
+        Maximum_Heap_Size="-Xmx{}"
+        Initial_Heap_Size="-Xms{}"
+        Thread_Stack_Size="-Xss{}"
+        
     Global=ArgManager()
     
     def cmdName(self) -> str:
         return "java"
 
 class javac(_javaCmd):
+    
+    class Arg(Enum):
+        Version="-version"
+        Dir="-d {}"
+        Encoding="-encoding {}"
+        Class_Path=_class_path("-classpath")
     
     Global=ArgManager()
     
@@ -53,10 +79,16 @@ class jar(_javaCmd):
     
     @property
     def command(self):
-        jar_path=Path(self.project.WorkPath if
+        
+        self.group:JavaGroup
+        
+        jar_path=Path(self.group.WorkPath if
             not (tmp:=self.getCustom(self.AvailableCustom.jar_path)) else tmp)
-        jar_path=jar_path.joinpath(x:=f"{self.project.Name}.jar" if
+        jar_path=jar_path.joinpath(f"{self.group.Name}.jar" if
             not (tmp:=self.getCustom(self.AvailableCustom.jar_file)) else tmp)
+        
+        self.group.result=jar_path
+        
         return "{} {} {} {} -C {}".format(
             self.getExecutable(),
             self.getArgString(),
@@ -65,7 +97,7 @@ class jar(_javaCmd):
             self.getFilesString()
         )
 
-class JavaProject(BaseBuilder):
+class JavaGroup(BaseGroup):
     
     Global=ArgManager()
     
@@ -80,3 +112,6 @@ class JavaProject(BaseBuilder):
     @JavaHome.setter
     def JavaHome(self,JavaHome):
         self.__JavaHome=JavaHome
+
+class JavaProject(BaseProject):
+    pass

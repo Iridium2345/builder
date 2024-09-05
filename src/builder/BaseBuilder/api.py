@@ -3,16 +3,21 @@ from __future__ import annotations
 from abc import ABC, ABCMeta, abstractmethod
 from enum import EnumType,Enum
 from pathlib import Path
-from typing import Any, Iterable, Tuple , Self
+from typing import Any, Iterable, Tuple , Self , TypeVar
 
 from ..util.types import FileFilter
 
+Arg = TypeVar("Arg",str,Enum,Path,int)
+
 class ArgManagerAPI(ABC):
+    
+    Arg:EnumType
+    
     @abstractmethod
-    def addArg(self,name:str|Enum,value:str|Iterable=None) -> Self : pass
+    def addArg(self,name:Arg,value:Arg|Iterable[Arg]=None) -> Self : pass
 
     @abstractmethod
-    def addArgs(self,*args:Tuple[str|Enum,str|None]) -> Self: pass
+    def addArgs(self,*args:Tuple[Arg,Arg]) -> Self: pass
 
     @abstractmethod
     def removeArg(self,name) -> str : pass
@@ -22,7 +27,7 @@ class ArgManagerAPI(ABC):
 
 
 class CommandMeta(ABCMeta):
-    def __matmul__(self,target:BuilderAPI) -> CommandAPI :
+    def __matmul__(self,target:CmdGroupAPI) -> CommandAPI :
         target.addCommand(tmp:=self(target))
         return tmp
 
@@ -33,10 +38,10 @@ class CommandAPI(ArgManagerAPI,metaclass=CommandMeta):
     Global:ArgManagerAPI=None
 
     @abstractmethod
-    def addDir(self,path:Path|str|Enum,filter:FileFilter,recursion:bool=True) -> Self:pass
+    def addDir(self,path:Arg,filter:FileFilter,recursion:bool=True) -> Self:pass
 
     @abstractmethod
-    def addFile(self,path:Path|str|Enum) -> Self:pass
+    def addFile(self,path:Arg) -> Self:pass
 
     @abstractmethod
     def iterFiles(self) -> Iterable[Path]:pass
@@ -53,18 +58,18 @@ class CommandAPI(ArgManagerAPI,metaclass=CommandMeta):
 
     @property
     @abstractmethod
-    def project(self) -> BuilderAPI:pass
+    def group(self) -> CmdGroupAPI:pass
 
     @abstractmethod
     def start(self,workPath:Path|str) -> None: pass
 
 
-class BuilderAPI(ArgManagerAPI):
+class CmdGroupAPI(ArgManagerAPI):
 
     Global:ArgManagerAPI=None
 
     @abstractmethod
-    def build(self) -> None:pass
+    def run(self) -> None:pass
 
     @property
     @abstractmethod
@@ -72,8 +77,12 @@ class BuilderAPI(ArgManagerAPI):
 
     @WorkPath.setter
     @abstractmethod
-    def WorkPath(self,path:Path|str|Enum) -> None:pass
+    def WorkPath(self,path:Arg) -> None:pass
 
+    @property
+    @abstractmethod
+    def result(self) -> Any:pass
+    
     @property
     def Name(self) -> str:pass
 
@@ -82,4 +91,13 @@ class BuilderAPI(ArgManagerAPI):
 
     @abstractmethod
     def cmdlst(self) -> Iterable[str]:pass
+
+class ProjectAPI(ABC):
+    @abstractmethod
+    def addGroup(self,name:Any,group:type[CmdGroupAPI]) -> None:pass
     
+    @abstractmethod
+    def runGroup(self,name:Any) -> None:pass
+    
+    @abstractmethod
+    def getGroup(self,name:Any) -> CmdGroupAPI:pass
