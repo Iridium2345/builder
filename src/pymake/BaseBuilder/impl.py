@@ -7,7 +7,9 @@ from ..util.func import enum2value
 from pathlib import Path 
 from typing import Iterable,List,Tuple,Self,Any,Dict
 from collections.abc import Iterator
+from enum import Enum
 import subprocess
+
 
 class ArgManager(ArgManagerAPI):
     
@@ -16,7 +18,7 @@ class ArgManager(ArgManagerAPI):
         self.__args={}
     
     def addArg(self, name: Any, value: Arg|Iterable[Arg] = None) -> Self:
-        name=enum2value(name)
+        # name=enum2value(name)
         value=enum2value(value)
         self.__args[name]=value
         return self
@@ -31,6 +33,9 @@ class ArgManager(ArgManagerAPI):
     
     def iterArg(self) -> Iterable[Tuple[str,str]]:
         yield from self.__args.items()
+        
+    def getArg(self, name):
+        return self.__args[name] if name in self.__args.keys() else None
     
 class BaseCommand(ArgManager,CommandAPI):
     
@@ -55,7 +60,7 @@ class BaseCommand(ArgManager,CommandAPI):
         
     def getArgString(self):
         self.addArgs(*self.Global.iterArg())
-        return " ".join([key.format(value if not value is None else '') for key,value in self.iterArg()])
+        return " ".join([(key.value if isinstance(key,Enum) else key).format("" if value is None else value) for key,value in self.iterArg()])
         
     def getFilesString(self):
         return " ".join([str(path) for path in self.iterFiles()])
@@ -113,7 +118,7 @@ class BaseGroup(ArgManager,CmdGroupAPI):
             if not (code:=command.start(self.WorkPath)) == 0:
                 print(f"sub proccess '{command.command}' exit with code {code} , build stoped")
                 return
-        print("successed")
+        print(f"Command Group {self.Name} execute")
     
     @property
     def result(self):
@@ -125,8 +130,7 @@ class BaseGroup(ArgManager,CmdGroupAPI):
         self.__result=value
     
     def addCommand(self, Command: CommandAPI) -> None:
-        if len(self.__commands)>0:
-            print(self.__commands[-1].command)
+        # if len(self.__commands)>0:print(self.__commands[-1].command)
         self.__commands.append(Command)
     
     @property

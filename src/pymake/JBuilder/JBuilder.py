@@ -24,7 +24,7 @@ class _javaCmd(BaseCommand):
         assert isinstance(self.group,JavaGroup)
         return ("{}\\".format(self.group.JavaHome) if self.group.JavaHome else '' )+self.cmdName() 
 
-class _class_path:
+class _class_path_list:
     
     def __init__(self,arg) -> None:
         self.arg=arg
@@ -32,15 +32,21 @@ class _class_path:
     def format(self,class_path):
         return self.arg+" "+";".join(map(str,class_path))        
 
+class _props:
+
+    def format(self,vars):
+        return " ".join(map(lambda x:f"-D{x}",vars))
+    
 class java(_javaCmd):
     
     class Arg(Enum):
         Version="-version"
         Jar="-jar"
-        Class_Path=_class_path("-classpath") 
+        Class_Path=_class_path_list("-classpath") 
         Maximum_Heap_Size="-Xmx{}"
         Initial_Heap_Size="-Xms{}"
         Thread_Stack_Size="-Xss{}"
+        Var=_props()
         
     Global=ArgManager()
     
@@ -53,7 +59,7 @@ class javac(_javaCmd):
         Version="-version"
         Dir="-d {}"
         Encoding="-encoding {}"
-        Class_Path=_class_path("-classpath")
+        Class_Path=_class_path_list("-classpath")
     
     Global=ArgManager()
     
@@ -89,11 +95,11 @@ class jar(_javaCmd):
         
         self.group.result=jar_path
         
-        return "{} {} {} {} -C {}".format(
+        return "{} {} {} {} {}".format(
             self.getExecutable(),
             self.getArgString(),
             jar_path,
-            self.getCustom(self.AvailableCustom.mani_file),
+            tmp if (tmp:=self.getCustom(self.AvailableCustom.mani_file)) else "",
             self.getFilesString()
         )
 

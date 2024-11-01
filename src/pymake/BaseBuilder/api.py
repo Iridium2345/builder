@@ -4,6 +4,7 @@ from abc import ABC, ABCMeta, abstractmethod
 from enum import EnumType,Enum
 from pathlib import Path
 from typing import Any, Iterable, Tuple , Self , TypeVar
+from logging import Logger
 
 from ..util.types import FileFilter
 
@@ -25,6 +26,8 @@ class ArgManagerAPI(ABC):
     @abstractmethod
     def iterArg(self) -> Iterable[Tuple[str,str]]: pass
 
+    @abstractmethod
+    def getArg(self,name) -> str: pass
 
 class CommandMeta(ABCMeta):
     def __matmul__(self,target:CmdGroupAPI) -> CommandAPI :
@@ -35,6 +38,8 @@ class CommandAPI(ArgManagerAPI,metaclass=CommandMeta):
 
     AvailableCustom:EnumType=None
 
+    Arg:EnumType=None
+    
     Global:ArgManagerAPI=None
 
     @abstractmethod
@@ -62,7 +67,6 @@ class CommandAPI(ArgManagerAPI,metaclass=CommandMeta):
 
     @abstractmethod
     def start(self,workPath:Path|str) -> None: pass
-
 
 class CmdGroupAPI(ArgManagerAPI):
 

@@ -20,6 +20,6 @@ def _fileSearch(path:Enum|str|Path,filefilter:FileFilter=None,recursion:bool=Tru
             if filefilter(pth):
                 yield pth
         elif recursion:
-            yield from _fileSearch(pth)
+            yield from _fileSearch(pth,filefilter,recursion)
     return
 
