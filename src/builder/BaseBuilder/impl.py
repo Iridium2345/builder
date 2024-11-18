@@ -47,6 +47,7 @@ class BaseCommand(ArgManager,CommandAPI):
         self.addArgs(*project.iterArg())
         self.__custom={}
         self.__group:CmdGroupAPI=project
+        self.workPath = None
     
     def setCustom(self,k, v) -> Self:
         self.__custom[k]=enum2value(v)
@@ -92,7 +93,12 @@ class BaseCommand(ArgManager,CommandAPI):
         return f"{self.getExecutable()} {self.getArgString()} {self.getFilesString()}"
     
     def start(self,workPath:Path|str) -> None:
+        if(self.workPath):workPath = self.workPath
         return subprocess.run(self.command,cwd=workPath.absolute()).returncode 
+    
+    def setWorkPath(self, path):
+        self.workPath = path
+        return self
     
 class BaseGroup(ArgManager,CmdGroupAPI):
     

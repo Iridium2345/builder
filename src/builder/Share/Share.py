@@ -34,7 +34,10 @@ class Remove(BaseCommand):
     
     def start(self, workPath):
         print(f"remove dir {self.getFilesString()}")
-        shutil.rmtree(self.getFilesString())
+        try:
+            shutil.rmtree(self.getFilesString())
+        except Exception as e:
+            print(e)
         return 0
 
 class Mkdir(BaseCommand):

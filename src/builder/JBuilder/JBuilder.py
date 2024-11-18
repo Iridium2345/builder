@@ -58,6 +58,7 @@ class javac(_javaCmd):
     class Arg(Enum):
         Version="-version"
         Dir="-d {}"
+        SourceParh="-sourcepath {}"
         Encoding="-encoding {}"
         Class_Path=_class_path_list("-classpath")
     

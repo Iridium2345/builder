@@ -68,6 +68,9 @@ class CommandAPI(ArgManagerAPI,metaclass=CommandMeta):
     @abstractmethod
     def start(self,workPath:Path|str) -> None: pass
 
+    @abstractmethod
+    def setWorkPath(self,workPath:Path|str) -> None: pass
+    
 class CmdGroupAPI(ArgManagerAPI):
 
     Global:ArgManagerAPI=None
