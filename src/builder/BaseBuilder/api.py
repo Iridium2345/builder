@@ -57,6 +57,9 @@ class CommandAPI(ArgManagerAPI,metaclass=CommandMeta):
     @abstractmethod
     def getCustom(self,k) -> Any:pass
 
+    @abstractmethod
+    def showInfo(self) -> Self:pass
+    
     @property
     @abstractmethod
     def command(self) -> str : pass

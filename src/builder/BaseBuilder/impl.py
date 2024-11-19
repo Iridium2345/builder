@@ -92,9 +92,18 @@ class BaseCommand(ArgManager,CommandAPI):
     def command(self):
         return f"{self.getExecutable()} {self.getArgString()} {self.getFilesString()}"
     
+    def showInfo(self):
+        print(
+            f"WorkAt:{self.workPath}",
+            f"Command:{self.command}",
+            f"Group:{self.group}",
+            sep="\n"
+        )
+        return self
+    
     def start(self,workPath:Path|str) -> None:
         if(self.workPath):workPath = self.workPath
-        return subprocess.run(self.command,cwd=workPath.absolute()).returncode 
+        return subprocess.run(self.command,cwd=workPath.absolute(),check=True,shell=True).returncode 
     
     def setWorkPath(self, path):
         self.workPath = path
