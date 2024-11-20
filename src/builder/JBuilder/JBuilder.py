@@ -104,6 +104,16 @@ class jar(_javaCmd):
             self.getFilesString()
         )
 
+class javadoc(_javaCmd):
+    
+    class Arg(Enum):
+        verbose = "-verbose"
+        encoding = "-encoding {}"
+        classpath = _class_path_list()
+        dir = "-d {}"
+    def cmdName(self):
+        return "javadoc"
+
 class JavaGroup(BaseGroup):
     
     Global=ArgManager()
