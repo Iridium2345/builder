@@ -109,8 +109,11 @@ class javadoc(_javaCmd):
     class Arg(Enum):
         verbose = "-verbose"
         encoding = "-encoding {}"
-        classpath = _class_path_list()
+        classpath = _class_path_list("-classpath")
         dir = "-d {}"
+        subpackages = "-subpackages {}"
+        charset = "-charset {}"
+        
     def cmdName(self):
         return "javadoc"
 
