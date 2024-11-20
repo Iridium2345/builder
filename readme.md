@@ -13,5 +13,5 @@ pip install -e .
 To use this module for Specific project
 Jusr copy ./src/builder to project path
 ```bash
-cp src/builder [project path]/builder
+cp -r src/builder [project-path]/builder
 ```  
