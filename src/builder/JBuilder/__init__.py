@@ -1,4 +1,4 @@
-from .JBuilder import jar,java,javac,JavaGroup,JavaProject,JFilter
+from .JBuilder import jar,java,javac,JavaGroup,JavaProject,JFilter,javadoc
 
 __all__=[
     "jar",
@@ -6,5 +6,6 @@ __all__=[
     "javac",
     "JavaGroup",
     "JavaProject",
-    "JFilter"
+    "JFilter",
+    "javadoc"
 ]
