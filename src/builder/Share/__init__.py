@@ -1,6 +1,7 @@
-from .Share import Copy,Remove,Mkdir
+from .Share import Copy,Remove,Mkdir,Do
 __all__ = [
     "Copy",
     "Remove",
-    "Mkdir"
+    "Mkdir",
+    "Do"
     ]

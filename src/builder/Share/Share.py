@@ -1,5 +1,7 @@
+from ..BaseBuilder.api import CommandAPI
 from ..BaseBuilder.impl import BaseCommand
 
+from typing import Callable, Self ,Literal
 from enum import Enum 
 from pathlib import Path
 import shutil
@@ -46,3 +48,15 @@ class Mkdir(BaseCommand):
         print(f"create {self.getFilesString()}")
         os.makedirs(self.getFilesString(),exist_ok=True)
         return 0
+
+class Do(BaseCommand):
+    """
+        Highly customizable command that accepts a
+        Callable[[CommandAPI,Path|str],Literal[0]|Any] 
+        value and runs
+    """
+    class Arg(Enum):
+        todo = "todo"
+    
+    def start(self, workPath):
+        return self.getArg(self.Arg.todo)(self,workPath)

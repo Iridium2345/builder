@@ -111,3 +111,6 @@ class ProjectAPI(ABC):
     
     @abstractmethod
     def getGroup(self,name:Any) -> CmdGroupAPI:pass
+    
+    @abstractmethod
+    def start(self):pass
