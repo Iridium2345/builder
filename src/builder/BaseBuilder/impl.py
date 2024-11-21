@@ -6,7 +6,7 @@ from ..util.func import enum2value
 
 from pathlib import Path 
 from typing import Iterable,List,Tuple,Self,Any,Dict
-from collections.abc import Iterator
+from collections import OrderedDict
 from enum import Enum
 import subprocess
 
@@ -131,7 +131,7 @@ class BaseGroup(ArgManager,CmdGroupAPI):
     def run(self) -> None:
         for command in self.__commands:
             if not (code:=command.start(self.WorkPath)) == 0:
-                print(f"sub proccess '{command.command}' exit with code {code} , build stoped")
+                print(f"sub command '{command.command}' exit with code {code} , build stoped")
                 return
         print(f"Command Group {self.Name} execute")
     
@@ -163,7 +163,7 @@ class BaseProject(ProjectAPI):
     
     def __init__(self) -> None:
         super().__init__()
-        self.__group:Dict[Any,CmdGroupAPI]={}    
+        self.__group:OrderedDict[Any,CmdGroupAPI]=OrderedDict()    
     
     def addGroup(self, name: Any, group: type[CmdGroupAPI]) -> CmdGroupAPI:
         self.__group[name]=group(name)
@@ -174,3 +174,7 @@ class BaseProject(ProjectAPI):
     
     def getGroup(self, name: Any) -> CmdGroupAPI:
         return self.__group[name] if name in self.__group.keys() else None
+    
+    def start(self):
+        for group in self.__group.values():
+            group.run()
